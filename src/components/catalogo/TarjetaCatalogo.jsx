@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Card, Badge, Modal, Button } from "react-bootstrap";
 
 const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
+
   const [mostrarModal, setMostrarModal] = useState(false);
 
   const descripcion = producto.descripcion_producto || "";
+
   const previsualizacionTexto =
     descripcion.length > 50
       ? descripcion.substring(0, 50) + "..."
@@ -16,24 +18,37 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
     <>
       <Card
         className="h-100 border-0 shadow-lg overflow-hidden position-relative cursor-pointer"
-        style={{ transition: "transform 0.03, box-shadow 0.3s" }}
+        style={{
+          transition: "transform 0.3s, box-shadow 0.3s",
+          cursor: "pointer",
+        }}
         role="button"
         tabIndex={0}
         onClick={() => setMostrarModal(true)}
-        onKeyDown={(e) => e.key === "Enter" && setMostrarModal(true)}
-        aria-labelledby={"producto-${producto.id}-title"}
+        onKeyDown={(e) =>
+          e.key === "Enter" && setMostrarModal(true)
+        }
+        aria-labelledby={`producto-${producto.id_producto}-title`}
       >
+
+        {/* Imagen */}
         <div
           className="ratio ratio-1x1 bg-light"
           style={{ overflow: "hidden" }}
         >
+
           {producto.url_imagen ? (
             <img
               src={producto.url_imagen}
               alt={producto.nombre_producto}
               className="card-img-top object-fit-cover"
               loading="lazy"
-              style={{ transition: "transform 0.4s" }}
+              style={{
+                transition: "transform 0.4s",
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+              }}
               onMouseEnter={(e) =>
                 (e.currentTarget.style.transform = "scale(1.1)")
               }
@@ -46,45 +61,62 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
               <i className="bi bi-image text-muted fs-1"></i>
             </div>
           )}
+
         </div>
+
+        {/* Contenido */}
         <Card.Body className="d-flex flex-column p-3">
+
           <Card.Title
-            id={"producto-${producto.id_producto}-title"}
+            id={`producto-${producto.id_producto}-title`}
             className="h6 fw-bold text-dark mb-2"
           >
             {producto.nombre_producto}
           </Card.Title>
 
+          {/* Descripción */}
           {descripcion && (
-            <Card.Text className="text-muted small flex-grow-1">
-              {previsualizacionTexto}
-              {tieneMasTexto && (
-                <span className="text-primary fw-medium ms-1">
-                  {" Leer más"}
-                </span>
-              )}
+            <div className="text-muted small flex-grow-1">
+
+              <span>
+                {previsualizacionTexto}
+
+                {tieneMasTexto && (
+                  <span className="text-primary fw-medium ms-1">
+                    Leer más
+                  </span>
+                )}
+              </span>
 
               <div className="mt-2">
-                <Badge bg="secondary" pill size="sm">
+                <Badge bg="secondary" pill>
                   {categoriaNombre || "Sin categoría"}
                 </Badge>
               </div>
-            </Card.Text>
+
+            </div>
           )}
+
           <hr />
+
+          {/* Precio */}
           <div className="mt-auto pt-2">
             <h4 className="text-success fw-bold mb-0">
-              C${parseFloat(producto.precio_venta).toFixed(1)}
+              C${parseFloat(producto.precio_venta).toFixed(2)}
             </h4>
           </div>
+
         </Card.Body>
       </Card>
+
+      {/* MODAL */}
       <Modal
         show={mostrarModal}
         onHide={() => setMostrarModal(false)}
         size="lg"
         centered
       >
+
         <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title className="fw-bold fs-4">
             {producto.nombre_producto}
@@ -92,8 +124,12 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
         </Modal.Header>
 
         <Modal.Body className="pt-3">
+
           <div className="row g-4">
+
+            {/* Imagen */}
             <div className="col-md-5">
+
               {producto.url_imagen ? (
                 <img
                   src={producto.url_imagen}
@@ -113,10 +149,12 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
                   <i className="bi bi-image text-muted fs-1"></i>
                 </div>
               )}
+
             </div>
 
-            {/* Detalles a la derecha */}
+            {/* Información */}
             <div className="col-md-7">
+
               <div className="d-flex align-items-center mb-3">
                 <Badge bg="secondary" pill className="me-2">
                   {categoriaNombre || "Sin categoría"}
@@ -124,26 +162,39 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
               </div>
 
               <h3 className="text-success fw-bold mb-4">
-                C${parseFloat(producto.precio_venta).toFixed(1)}
+                C${parseFloat(producto.precio_venta).toFixed(2)}
               </h3>
 
               {descripcion && (
                 <>
-                  <h5 className="fw-semibold mb-2">Descripción</h5>
-                  <p className="text-muted lead" style={{ lineHeight: "1.2" }}>
+                  <h5 className="fw-semibold mb-2">
+                    Descripción
+                  </h5>
+
+                  <p
+                    className="text-muted lead"
+                    style={{ lineHeight: "1.5" }}
+                  >
                     {descripcion}
                   </p>
                 </>
               )}
+
             </div>
+
           </div>
+
         </Modal.Body>
 
         <Modal.Footer className="border-0">
-          <Button variant="secondary" onClick={() => setMostrarModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setMostrarModal(false)}
+          >
             Cerrar
           </Button>
         </Modal.Footer>
+
       </Modal>
     </>
   );
