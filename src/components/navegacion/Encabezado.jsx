@@ -1,193 +1,185 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Container, Nav, Navbar, Offcanvas } from "react-bootstrap";
+import { Navbar, Nav, Container } from "react-bootstrap";
 import { supabase } from "../../database/supabaseconfig";
 import logo from "../../assets/logo.png";
 
 const Encabezado = () => {
 
-const [mostrarMenu, setMostrarMenu] = useState(false);
   const navigate = useNavigate();
-  const location = useLocation(); // Para detectar la ruta actual
+  const location = useLocation();
 
-  const manejarToggle = () => setMostrarMenu(!mostrarMenu);
+  const esLogin =
+    location.pathname === "/login";
 
-  const manejarNavegacion = (ruta) => {
+  const paginas = [
+    {
+      ruta: "/",
+      texto: "Inicio"
+    },
+    {
+      ruta: "/categorias",
+      texto: "Categorías"
+    },
+    {
+      ruta: "/productos",
+      texto: "Productos"
+    },
+    {
+      ruta: "/empleados",
+      texto: "Empleados"
+    },
+    {
+      ruta: "/clientes",
+      texto: "Clientes"
+    },
+    {
+      ruta: "/ventas",
+      texto: "Ventas"
+    },
+    {
+      ruta: "/catalogo",
+      texto: "Catálogo"
+    }
+  ];
+
+  const ir = (ruta) => {
+
     navigate(ruta);
-    setMostrarMenu(false);
+
   };
 
   const cerrarSesion = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
 
-      localStorage.removeItem("usuario-supabase");
-      setMostrarMenu(false);
-      navigate("/login");
-    } catch (err) {
-      console.error("Error cerrando sesión:", err.message);
-    }
+    await supabase.auth.signOut();
+
+    localStorage.removeItem(
+      "usuario-supabase"
+    );
+
+    navigate("/login");
+
   };
 
-  // Detectar rutas especiales
-  const esLogin = location.pathname === "/login";
-  const esCatalogo =
-    location.pathname === "/catalogo" &&
-    localStorage.getItem("usuario-supabase") === null;
-
-  // Contenido del menú
-  let contenidoMenu;
-
-  if (esLogin) {
-    contenidoMenu = (
-      <Nav className="ms-auto pe-2">
-        <Nav.Link
-          onClick={() => manejarNavegacion("/login")}
-          className={mostrarMenu ? "color-texto-marca" : "text-white"}
-        >
-          <i className="bi-person-fill-lock me-2"></i>
-          Iniciar sesión
-        </Nav.Link>
-      </Nav>
-    );
-  } else {
-    if (esCatalogo) {
-      contenidoMenu = (
-        <Nav className="ms-auto pe-2">
-          <Nav.Link
-            onClick={() => manejarNavegacion("/catalogo")}
-            className={mostrarMenu ? "color-texto-marca" : "text-white"}
-          >
-            <i className="bi-images me-2"></i>
-            <strong>Catálogo</strong>
-          </Nav.Link>
-        </Nav>
-      );
-    } else {
-      contenidoMenu = (
-        <>
-          <Nav className="ms-auto pe-2">
-            <Nav.Link
-              onClick={() => manejarNavegacion("/")}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
-            >
-              {mostrarMenu ? <i className="bi-house-fill me-2"></i> : null}
-              <strong>Inicio</strong>
-            </Nav.Link>
-
-            <Nav.Link
-              onClick={() => manejarNavegacion("/categorias")}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
-            >
-              {mostrarMenu ? <i className="bi-bookmark-fill me-2"></i> : null}
-              <strong>Categorías</strong>
-            </Nav.Link>
-
-            <Nav.Link
-              onClick={() => manejarNavegacion("/productos")}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
-            >
-              {mostrarMenu ? <i className="bi-bag-heart-fill me-2"></i> : null}
-              <strong>Productos</strong>
-            </Nav.Link>
-
-            {/* Opción para ir al catálogo público desde admin */}
-            <Nav.Link
-              onClick={() => manejarNavegacion("/catalogo")}
-              className={mostrarMenu ? "color-texto-marca" : "text-white"}
-            >
-              {mostrarMenu ? <i className="bi-images me-2"></i> : null}
-              <strong>Catálogo</strong>
-            </Nav.Link>
-
-            <hr />
-
-            {/* Ícono cerrar sesión en barra superior */}
-            
-              <Nav.Link
-                onClick={cerrarSesion}
-                className="text-white"
-
-              >
-                <i className="bi-box-arrow-right me-2"></i>
-                <strong> Cerrar sesión</strong>
-              </Nav.Link>
-
-            <hr />
-          </Nav>
-
-          {/* Información de usuario y botón cerrar sesión */}
-          {mostrarMenu && (
-            <div className="mt-3 p-3 rounded bg-light text-dark">
-              <p className="mb-2">
-                <i className="bi-envelope-fill me-2"></i>
-                {localStorage.getItem("usuario-supabase")?.toLowerCase() ||
-                  "Usuario"}
-              </p>
-              <button
-                className="btn btn-outline-danger mt-3 w-100"
-                onClick={cerrarSesion}
-              >
-                <i className="bi-box-arrow-right me-2"></i>
-                Cerrar sesión
-              </button>
-            </div>
-          )}
-        </>
-      );
-    }
-  }
-
   return (
+
     <Navbar
-      expand="md"
+      expand="lg"
       fixed="top"
-      className="color-navbar shadow-lg"
       variant="dark"
+      className="
+      color-navbar
+      shadow-sm
+      py-2
+      "
     >
+
       <Container>
+
+        {/* Logo */}
+
         <Navbar.Brand
-          onClick={() => manejarNavegacion(esCatalogo ? "/catalogo" : "/")}
-          className="text-white fw-bold d-flex align-items-center"
-          style={{ cursor: "pointer" }}
+          onClick={() => ir("/")}
+          className="
+          d-flex
+          align-items-center
+          gap-2
+          "
+          style={{
+            cursor: "pointer"
+          }}
         >
+
           <img
-            alt=""
             src={logo}
-            width="45"
-            height="45"
-            className="d-inline-block me-2"
+            alt="Logo"
+            width="40"
+            height="40"
           />
-          <strong>
-            <h4 className="mb-0">Discosa</h4>
-          </strong>
+
+          <span
+            className="
+            fw-bold
+            "
+          >
+
+            Discosa
+
+          </span>
+
         </Navbar.Brand>
 
-        {/* Botón del menú */}
         {!esLogin && (
-          <Navbar.Toggle
-            aria-controls="menu-offcanvas"
-            onClick={manejarToggle}
-          />
+
+          <>
+
+            <Navbar.Toggle />
+
+            <Navbar.Collapse>
+
+              {/* Centro */}
+
+              <Nav
+                className="
+                mx-auto
+                gap-3
+                "
+              >
+
+                {paginas.map(
+                  (pagina) => (
+
+                  <Nav.Link
+                    key={
+                      pagina.ruta
+                    }
+                    onClick={() =>
+                      ir(
+                        pagina.ruta
+                      )
+                    }
+                  >
+
+                    {pagina.texto}
+
+                  </Nav.Link>
+
+                ))}
+
+              </Nav>
+
+              {/* Derecha */}
+
+              <Nav
+                className="
+                ms-auto
+                "
+              >
+
+                <Nav.Link
+                  onClick={
+                    cerrarSesion
+                  }
+                >
+
+                  Cerrar sesión
+
+                </Nav.Link>
+
+              </Nav>
+
+            </Navbar.Collapse>
+
+          </>
+
         )}
 
-        {/* Menú lateral */}
-        <Navbar.Offcanvas
-          id="menu-offcanvas"
-          placement="end"
-          show={mostrarMenu}
-          onHide={() => setMostrarMenu(false)}
-        >
-          <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Menú Discosa</Offcanvas.Title>
-          </Offcanvas.Header>
-
-          <Offcanvas.Body>{contenidoMenu}</Offcanvas.Body>
-        </Navbar.Offcanvas>
       </Container>
+
     </Navbar>
+
   );
+
 };
 
 export default Encabezado;
